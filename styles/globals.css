@@ -8,7 +8,6 @@
 @layer base {
   body {
     @apply flex flex-col items-center border-black border-2 h-screen;
-    font-family: "Montserrat";
   }
 }
 @layer components {

@@ -1,3 +1,4 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Checkbox,
   FormControl,
@@ -5,19 +6,18 @@ import {
   FormHelperText,
   Grid,
   InputLabel,
-  MenuItem,
+  MenuItem
 } from "@mui/material";
 import { Box } from "@mui/system";
+import axios from "axios";
+import { Controller, useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import * as yup from "yup";
+import BaseHeader from "../../src/components/BaseHeader";
 import Button from "../../src/components/Button";
 import InputText from "../../src/components/InputField";
-import InputMask from "react-input-mask";
-import BaseHeader from "../../src/components/BaseHeader";
-import { useForm, Controller } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { User } from "../../src/interfaces/User";
 import SelectField from "../../src/components/SelectField";
-import axios from "axios";
+import { IUser } from "../../src/interfaces/User";
 
 export default function Cadastro() {
   const schema = yup.object().shape({
@@ -66,12 +66,12 @@ export default function Cadastro() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<User>({
+  } = useForm<IUser>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmitHandler = async (data: User) => {
-    const response = await axios.post("/api/usuarios", {data});
+  const onSubmitHandler = async (data: IUser) => {
+    const response = await axios.post("/api/usuarios", { data });
     console.log(response.data);
   };
 
@@ -84,12 +84,14 @@ export default function Cadastro() {
         <FormControl
           variant="standard"
           fullWidth
-          className="flex gap-1 items-center">
+          className="flex gap-1 items-center"
+        >
           <Grid
             container
             rowSpacing={1}
             columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-            rowGap={1}>
+            rowGap={1}
+          >
             <Grid item xs={6}>
               <Controller
                 name="firstName"
@@ -206,7 +208,8 @@ export default function Cadastro() {
                   <InputMask
                     mask="99999999999"
                     onChange={onChange}
-                    value={value}>
+                    value={value}
+                  >
                     <InputText
                       required
                       type="text"
@@ -227,7 +230,8 @@ export default function Cadastro() {
                   <InputMask
                     mask="99/99/9999"
                     onChange={onChange}
-                    value={value}>
+                    value={value}
+                  >
                     <InputText
                       required
                       type="text"
@@ -254,7 +258,8 @@ export default function Cadastro() {
                       id="select-genre"
                       value={value}
                       onChange={onChange}
-                      label="Gênero">
+                      label="Gênero"
+                    >
                       <MenuItem value={1}>Masculino</MenuItem>
                       <MenuItem value={2}>Feminino</MenuItem>
                     </SelectField>

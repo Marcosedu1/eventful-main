@@ -1,11 +1,12 @@
 import { createTheme } from "@mui/material/styles";
-import { Montserrat } from '@next/font/google'
+import { Montserrat } from '@next/font/google';
 
 export const montSerrat = Montserrat({
   weight: ['100','200','300','400','500','600','700'],
   subsets:['latin'],
   display:'swap',
-  fallback:['Heveltica','Arial','sans-serif']
+  fallback:['Heveltica','Arial','sans-serif'],
+  variable: '--font-montserrat'
 })
 
 const theme = createTheme({

@@ -1,14 +1,14 @@
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
-import NavBar from "../src/components/NavBar";
-import Footer from "../src/components/Footer";
-import theme from "../src/theme/config";
 import { ThemeProvider } from "@mui/material";
+import type { AppProps } from "next/app";
+import Footer from "../src/components/Footer";
+import NavBar from "../src/components/NavBar";
+import theme, { montSerrat } from "../src/theme/config";
+import "../styles/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
-      <div className="wrapper">
+      <div className={`wrapper ${montSerrat.variable} font-sans`}>
         <NavBar />
         <Component {...pageProps} />
         <Footer />
