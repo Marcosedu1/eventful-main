@@ -1,10 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import Button from "../Button";
 
 export default function NavBar() {
-  const router = useRouter();
 
   const routes = [
     {
@@ -21,10 +19,6 @@ export default function NavBar() {
     },
   ];
 
-  const handleLogin = () => {
-    router.push("/usuario/login");
-  };
-
   return (
     <nav>
       <div className="flex items-center">
@@ -34,7 +28,6 @@ export default function NavBar() {
             alt="Eventful"
             width={50}
             height={50}
-            className="mr-10"
           />
         </Link>
 
@@ -46,7 +39,9 @@ export default function NavBar() {
           ))}
         </ul>
       </div>
-      <Button title="Entrar" onClick={handleLogin} size="sm" color="dark" />
+      <Link href={"/usuario/login"}>
+        <Button title="Entrar" size="sm" color="dark" />
+      </Link>
     </nav>
   );
 }

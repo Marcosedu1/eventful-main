@@ -8,15 +8,15 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import Button from "../../components/Button";
-import InputText from "../../components/InputField";
+import Button from "../../src/components/Button";
+import InputText from "../../src/components/InputField";
 import InputMask from "react-input-mask";
-import BaseHeader from "../../components/BaseHeader";
+import BaseHeader from "../../src/components/BaseHeader";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { User } from "../../interfaces/User";
-import SelectField from "../../components/SelectField";
+import { User } from "../../src/interfaces/User";
+import SelectField from "../../src/components/SelectField";
 import axios from "axios";
 
 export default function Cadastro() {

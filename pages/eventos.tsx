@@ -1,4 +1,4 @@
-import BaseHeader from "../components/BaseHeader";
+import BaseHeader from "../src/components/BaseHeader";
 
 export default function Events() {
   return (

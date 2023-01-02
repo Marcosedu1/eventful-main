@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import BaseHeader from "../components/BaseHeader";
-import Button from "../components/Button";
+import BaseHeader from "../src/components/BaseHeader";
+import Button from "../src/components/Button";
 
 export default function Custom404() {
   const router = useRouter();

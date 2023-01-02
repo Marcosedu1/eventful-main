@@ -6,13 +6,13 @@ import { Box } from "@mui/system";
 import { useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Button from "../../components/Button";
+import Button from "../../src/components/Button";
 import Link from "next/link";
-import InputText from "../../components/InputField";
-import BaseHeader from "../../components/BaseHeader";
+import InputText from "../../src/components/InputField";
+import BaseHeader from "../../src/components/BaseHeader";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { User } from "../../interfaces/User";
+import { User } from "../../src/interfaces/User";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 

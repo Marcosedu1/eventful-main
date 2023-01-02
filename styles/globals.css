@@ -2,13 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
-  --wrapper-width: 1100px
+:root {
+  --wrapper-width: 1100px;
 }
 @layer base {
   body {
     @apply flex flex-col items-center border-black border-2 h-screen;
-    font-family: "Montserrat"
+    font-family: "Montserrat";
   }
 }
 @layer components {
@@ -17,14 +17,17 @@
     width: var(--wrapper-width);
   }
   nav {
-    @apply flex w-full p-5 items-center border-b-2 justify-between;
+    @apply flex w-full p-5 items-center border-b-2 justify-between mb-5;
+  }
+
+  footer {
+    @apply w-full p-5 border-t-2 mt-8;
   }
 
   .menu {
-    @apply flex flex-row gap-14;
+    @apply flex flex-row gap-14 ml-10;
   }
-
 }
 .MuiFormHelperText-root {
-  @apply text-red-500
+  @apply text-red-500;
 }
