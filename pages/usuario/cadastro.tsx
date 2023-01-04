@@ -6,7 +6,7 @@ import {
   FormHelperText,
   Grid,
   InputLabel,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
@@ -269,21 +269,24 @@ export default function Cadastro() {
               </FormControl>
             </Grid>
             <Grid item xs={6}>
-              <Controller
-                name="acceptedTerms"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox required onChange={onChange} value={value} />
-                    }
-                    label="Concordo com os Termos de Uso e Política de Privacidade"
-                  />
-                )}
-              />
-              <FormHelperText>{errors.acceptedTerms?.message}</FormHelperText>
+              <FormControl fullWidth>
+                <Controller
+                  name="acceptedTerms"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <FormControlLabel
+                      control={
+                        <Checkbox required onChange={onChange} value={value} />
+                      }
+                      label="Concordo com os Termos de Uso e Política de Privacidade"
+                    />
+                  )}
+                />
+                <FormHelperText>{errors.acceptedTerms?.message}</FormHelperText>
+              </FormControl>
             </Grid>
           </Grid>
+
           <Button
             size="sm"
             color="secondary"

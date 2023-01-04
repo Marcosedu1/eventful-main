@@ -6,12 +6,8 @@ export default function NavBar() {
 
   const routes = [
     {
-      label: "Home",
-      to: "/",
-    },
-    {
       label: "Eventos",
-      to: "/eventos",
+      to: "/",
     },
     {
       label: "Organize",

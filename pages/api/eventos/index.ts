@@ -1,6 +1,6 @@
-import { IEvent } from './../../../src/interfaces/Event';
+import { getTime } from "date-fns";
 import { NextApiRequest, NextApiResponse } from "next";
-import { randomUUID } from "node:crypto";
+import { IEvent } from './../../../src/interfaces/Event';
 
 export default function handler(
   request: NextApiRequest,
@@ -8,26 +8,26 @@ export default function handler(
 ) {
   const events: IEvent[] = [
     {
-      id: randomUUID(),
+      id: 1,
       title: 'Marciano',
       banner: 'banner.jpg',
-      date: new Date(),
+      date: getTime(new Date()),
       location: 'rua alguma coisa',
       description: 'descricao qualquer'
     },
     {
-      id: randomUUID(),
+      id: 2,
       title: 'Selva',
       banner: 'banner2.jpg',
-      date: new Date(),
+      date: getTime(new Date()),
       location: 'rua alguma coisa',
       description: 'descricao qualquer'
     },
     {
-      id: randomUUID(),
+      id: 3,
       title: 'Carae',
       banner: 'banner3.png',
-      date: new Date(),
+      date: getTime(new Date()),
       location: 'rua alguma coisa',
       description: 'descricao qualquer'
     }

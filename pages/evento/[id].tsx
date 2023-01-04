@@ -1,23 +1,23 @@
 import { Divider, Grid, Paper, Typography } from "@mui/material";
-import axios from "axios";
 import { GetStaticPropsContext } from "next";
 import Image from "next/image";
 import BaseHeader from "../../src/components/BaseHeader";
 import CardDetails from "../../src/components/CardDetails";
 import { IEvent } from "../../src/interfaces/Event";
 
-export default function EventDetail({props}) {
-  console.log(props);
+export default function EventDetail(event: IEvent) {
+  
+  const { title, banner, description} = event
   
   return (
     <>
-      <BaseHeader title="Detalhes" />
+      <BaseHeader title={title} />
       <main>
         <Grid container>
           <Grid item className="relative" lg={8} md={8}>
             <Image
               alt="banner"
-              src="/assets/banner.jpg"
+              src={`/assets/${banner}`}
               className="max-h-[430px] w-full object-cover rounded-2xl"
               width={430}
               height={100}
@@ -31,7 +31,7 @@ export default function EventDetail({props}) {
               }}
               elevation={2}
             >
-              <CardDetails />
+              <CardDetails event={event} />
             </Paper>
           </Grid>
         </Grid>
@@ -41,7 +41,7 @@ export default function EventDetail({props}) {
             <Typography variant="h5" component="h5" className="font-light">
               Descrição do Evento
             </Typography>
-            <Typography className="my-4 text-gray-500">descricao</Typography>
+            <Typography className="my-4 text-gray-500">{description}</Typography>
           </Grid>
         </Grid>
       </main>
@@ -50,20 +50,20 @@ export default function EventDetail({props}) {
 }
 
 export async function getStaticPaths() {
-  const response = await axios.get<IEvent[]>("/api/eventos");
+  const response = await fetch("http://localhost:3000/api/eventos")
+  const events = await response.json();
 
-  const paths = response.data.map((event) => ({
-    params: { id: event.id },
-  }));
-  console.log(paths);
-  
+  const paths = events?.map((event: IEvent) => ({
+    params: { id: event.id.toString() }
+  }))
 
-  return { paths, fallback: false };
+  return { paths, fallback: false }
 }
 
 export async function getStaticProps(context: GetStaticPropsContext) {
-  const response = await axios.get<IEvent[]>("/api/eventos");
-  const event = response.data.filter((data) => data.id === context?.params?.id);
+  const response = await fetch("http://localhost:3000/api/eventos")
+  const events = await response.json();
+  const event = events?.filter((data: IEvent) => data.id === Number(context?.params?.id));
 
   if (!event) {
     return {
@@ -72,6 +72,6 @@ export async function getStaticProps(context: GetStaticPropsContext) {
   }
 
   return {
-    props: { event },
+    props: { ...event[0] },
   };
 }

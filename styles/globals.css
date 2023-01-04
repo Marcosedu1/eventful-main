@@ -7,7 +7,7 @@
 }
 @layer base {
   body {
-    @apply flex flex-col items-center border-black border-2 h-screen;
+    @apply flex flex-col items-center h-screen;
   }
 }
 @layer components {

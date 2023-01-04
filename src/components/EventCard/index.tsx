@@ -1,5 +1,6 @@
 import { Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { IEvent } from "../../interfaces/Event";
@@ -22,7 +23,7 @@ export default function EventCard({
           className="rounded-xl"
         />
         <Box className="p-5">
-          <Typography sx={{ color: "rgba(255,155,0,1)" }}>date</Typography>
+          <Typography sx={{ color: "rgba(255,155,0,1)" }}>{format(date,'dd/MM/yyyy')}</Typography>
           <Typography variant="h5">{title}</Typography>
           <Typography className="mt-1">{location}</Typography>
         </Box>
