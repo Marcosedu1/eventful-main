@@ -12,7 +12,7 @@ import InputText from "../../src/components/InputField";
 import BaseHeader from "../../src/components/BaseHeader";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { User } from "../../src/interfaces/User";
+import { IUser } from "../../src/interfaces/User";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 
@@ -39,11 +39,11 @@ export default function Login() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<User>({
+  } = useForm<IUser>({
     resolver: yupResolver(schema),
   });
 
-  const onSubmitHandler = async (data: User) => {
+  const onSubmitHandler = async (data: IUser) => {
     const response = await axios.post("/api/usuarios", { data });
     console.log(response.data);
   };

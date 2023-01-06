@@ -1,6 +1,6 @@
 import { Slot } from "@radix-ui/react-slot";
-import clsx from "clsx"
-import { ButtonHTMLAttributes } from "react"
+import clsx from "clsx";
+import { ButtonHTMLAttributes } from "react";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement>{
   title?: string;

@@ -1,8 +1,12 @@
 export interface IEvent {
   id: number;
   title: string;
-  banner: string;
-  date: number;
-  location: string;
   description: string;
+  banner: string;
+  datetime: number;
+  cep: string;
+  city: string;
+  uf: string;
+  address: string;
+  number:string;
 }

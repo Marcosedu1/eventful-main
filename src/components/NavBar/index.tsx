@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useApp } from "../../context/AppContext";
 import Button from "../Button";
 
 export default function NavBar() {
+
+  const { isLogged } = useApp()
 
   const routes = [
     {
@@ -35,9 +38,9 @@ export default function NavBar() {
           ))}
         </ul>
       </div>
-      <Link href={"/usuario/login"}>
+      {!isLogged && <Link href={"/usuario/login"}>
         <Button title="Entrar" size="sm" color="dark" />
-      </Link>
+      </Link>}
     </nav>
   );
 }

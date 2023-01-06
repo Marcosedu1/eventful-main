@@ -2,16 +2,16 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { List, ListItem } from "@mui/material";
+import { format } from "date-fns";
 import { IEvent } from "../../interfaces/Event";
 import Button from "../Button";
-import { format } from "date-fns";
 
 type Props = {
   event: IEvent;
 };
 
 export default function CardDetails({
-  event: { title, date, location },
+  event: { title, date, address, number, city, uf, },
 }: Props) {
   return (
     <div>
@@ -28,7 +28,7 @@ export default function CardDetails({
           </ListItem>
           <ListItem className="text-sm">
             <LocationOnIcon sx={{ fontSize: "15px" }} className="mr-1" />
-            {location}
+            {address} {number}, {city}, {uf}
           </ListItem>
         </List>
       </div>
