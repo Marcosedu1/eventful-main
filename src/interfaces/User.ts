@@ -6,7 +6,7 @@ export type IUser = {
   confirmEmail: string;
   password: string;
   confirmPassword: string;
-  CPF: number;
+  cpf: number;
   birthdate: string;
   genre: number;
   acceptedTerms: boolean;

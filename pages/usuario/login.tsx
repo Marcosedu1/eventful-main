@@ -30,7 +30,7 @@ export default function Login() {
   const schema = yup.object().shape({
     email: yup
       .string()
-      .email("Por favor, forneça um endereço de email válido.")
+      .email("Por favor, forneça um endereço de e-mail válido.")
       .required("Este campo é obrigatório"),
     password: yup.string().required("Este campo é obrigatório"),
   });
@@ -66,7 +66,7 @@ export default function Login() {
                 type="email"
                 fullWidth
                 id="email"
-                placeholder="Email"
+                placeholder="E-mail"
                 onChange={onChange}
                 value={value}
                 helperText={errors.email?.message}

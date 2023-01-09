@@ -191,7 +191,7 @@ export default function Cadastro() {
                     required
                     type="password"
                     rounded
-                    label="Senha"
+                    label="Confirme a Senha"
                     fullWidth
                     onChange={onChange}
                     value={value}
@@ -202,7 +202,7 @@ export default function Cadastro() {
             </Grid>
             <Grid item xs={4}>
               <Controller
-                name="CPF"
+                name="cpf"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <InputMask
@@ -216,7 +216,7 @@ export default function Cadastro() {
                       rounded
                       label="CPF"
                       fullWidth
-                      helperText={errors.CPF?.message}
+                      helperText={errors.cpf?.message}
                     />
                   </InputMask>
                 )}

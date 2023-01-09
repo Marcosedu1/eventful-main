@@ -65,12 +65,6 @@ export default function Organize() {
 
   const debouncedCep = useDebounce(cep, 1000);
 
-  const onSubmitHandler = async (data: IEvent) => {
-    console.log(data);
-    const response = await axios.post("/api/evento", { data });
-    console.log(response.data);
-  };
-
   useEffect(() => {
     if (!selectedBanner) {
       setPreviewBanner(undefined);
@@ -109,6 +103,11 @@ export default function Organize() {
     return axios
       .get(`https://viacep.com.br/ws/${value}/json/`)
       .then((response) => response.data);
+  };
+
+  const onSubmitHandler = async (data: IEvent) => {
+    console.log(data);
+    const response = await axios.post("/api/evento", { data });
   };
 
   return (
@@ -318,6 +317,7 @@ export default function Organize() {
                           Enviar Banner
                         </Typography>
                         <input
+                          required
                           accept="image/*"
                           hidden
                           type="file"
