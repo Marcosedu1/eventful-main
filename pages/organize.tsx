@@ -19,7 +19,7 @@ export default function Organize() {
     title: yup
       .string()
       .min(5, "Este campo é obrigatório")
-      .max(30, "Titulo não pode exceder limite de 30 caracteres")
+      .max(100, "Titulo não pode exceder limite de 100 caracteres")
       .required("Este campo é obrigatório"),
     description: yup
       .string()

@@ -1,11 +1,7 @@
-import axios from "axios";
 import {
   createContext,
   FC,
-  useCallback,
   useContext,
-  useEffect,
-  useState,
 } from "react";
 import { IUser } from "../interfaces/User";
 
