@@ -3,10 +3,10 @@ export interface IEvent {
   title: string;
   description: string;
   banner: string;
-  datetime: number;
+  datetime: Date;
   cep: string;
   city: string;
   uf: string;
   address: string;
-  number:string;
+  number: string;
 }

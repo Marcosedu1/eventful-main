@@ -1,28 +1,30 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Banner from "../src/components/Banner";
 import BaseHeader from "../src/components/BaseHeader";
 import EventCard from "../src/components/EventCard";
+import { useApp } from "../src/context/AppContext";
+import useRequest from "../src/hooks/useRequest";
 import { IEvent } from "../src/interfaces/Event";
 
 export default function Home() {
-  const [events, setEvents] = useState<IEvent[]>([]);
+  const { checkUser } = useApp();
 
   useEffect(() => {
-    async function getEvents() {
-      const response = await axios.get<IEvent[]>("/api/eventos");
-      setEvents(response.data);
-    }
-    getEvents();
-  }, []);
+    checkUser();
+  }, [checkUser]);
+
+  const { data, error, isValidating } = useRequest<IEvent[]>({
+    url: "/event",
+    method: "GET",
+  });
 
   return (
     <>
       <BaseHeader title="Home" />
       <main>
-        {events.length && <Banner events={events} />}
+        {data && data?.length > 0 && <Banner events={data} />}
         <div className="grid grid-cols-3 gap-5">
-          {events?.map((event) => (
+          {data?.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
         </div>

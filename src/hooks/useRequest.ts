@@ -1,23 +1,24 @@
-import useSWR, { SWRConfiguration, SWRResponse } from 'swr'
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import useSWR, { SWRConfiguration, SWRResponse } from "swr";
+import { api } from "../config/api-client";
 
-export type GetRequest = AxiosRequestConfig | null
+export type GetRequest = AxiosRequestConfig | null;
 
 interface Return<Data, Error>
   extends Pick<
     SWRResponse<AxiosResponse<Data>, AxiosError<Error>>,
-    'isValidating' | 'error' | 'mutate'
+    "isValidating" | "error" | "mutate"
   > {
-  data: Data | undefined
-  response: AxiosResponse<Data> | undefined
+  data: Data | undefined;
+  response: AxiosResponse<Data> | undefined;
 }
 
 export interface Config<Data = unknown, Error = unknown>
   extends Omit<
     SWRConfiguration<AxiosResponse<Data>, AxiosError<Error>>,
-    'fallbackData'
+    "fallbackData"
   > {
-  fallbackData?: Data
+  fallbackData?: Data;
 }
 
 export default function useRequest<Data = unknown, Error = unknown>(
@@ -28,28 +29,28 @@ export default function useRequest<Data = unknown, Error = unknown>(
     data: response,
     error,
     isValidating,
-    mutate
+    mutate,
   } = useSWR<AxiosResponse<Data>, AxiosError<Error>>(
     request && JSON.stringify(request),
-    
-    () => axios.request<Data>(request!),
+
+    () => api.request<Data>(request!),
     {
       ...config,
       fallbackData: fallbackData && {
         status: 200,
-        statusText: 'InitialData',
+        statusText: "InitialData",
         config: request!,
         headers: {},
-        data: fallbackData
-      }
+        data: fallbackData,
+      },
     }
-  )
+  );
 
   return {
     data: response && response.data,
     response,
     error,
     isValidating,
-    mutate
-  }
+    mutate,
+  };
 }

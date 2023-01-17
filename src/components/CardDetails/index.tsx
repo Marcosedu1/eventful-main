@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function CardDetails({
-  event: { title, date, address, number, city, uf, },
+  event: { title, datetime, address, number, city, uf, },
 }: Props) {
   return (
     <div>
@@ -20,11 +20,11 @@ export default function CardDetails({
         <List className="ml-4">
           <ListItem className="text-sm">
             <CalendarTodayIcon sx={{ fontSize: "15px" }} className="mr-1" />
-            {format(date, 'dd/MM/yyyy')}
+            {format(new Date(datetime), 'dd/MM/yyyy')}
           </ListItem>
           <ListItem className="text-sm">
             <AccessTimeIcon sx={{ fontSize: "15px" }} className="mr-1" />
-            {format(date, 'HH:mm')}
+            {format(new Date(datetime), 'HH:mm')}
           </ListItem>
           <ListItem className="text-sm">
             <LocationOnIcon sx={{ fontSize: "15px" }} className="mr-1" />

@@ -9,7 +9,8 @@ import {
   MenuItem
 } from "@mui/material";
 import { Box } from "@mui/system";
-import axios from "axios";
+import { createHmac } from "crypto";
+import { useRouter } from "next/router";
 import { Controller, useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 import * as yup from "yup";
@@ -17,9 +18,12 @@ import BaseHeader from "../../src/components/BaseHeader";
 import Button from "../../src/components/Button";
 import InputText from "../../src/components/InputField";
 import SelectField from "../../src/components/SelectField";
+import { api } from "../../src/config/api-client";
 import { IUser } from "../../src/interfaces/User";
 
 export default function Cadastro() {
+  const router = useRouter();
+
   const schema = yup.object().shape({
     firstName: yup
       .string()
@@ -48,17 +52,18 @@ export default function Cadastro() {
       .string()
       .oneOf([yup.ref("password"), null], "Senha não corresponde")
       .required("Este campo é obrigatório"),
-    CPF: yup
+    cpf: yup
       .string()
       .min(11, "CPF deve conter 11 caracteres")
       .max(11, "CPF inválido")
       .required("Este campo é obrigatório"),
     birthdate: yup
       .date()
+      //..transform((value, originalValue) => originalValue ? parse(originalValue, "yyyy-MM-dd", new Date()) : value)
       .max(new Date(), "Digite uma data válida")
       .required("Este campo é obrigatório")
       .typeError("Digite uma data válida"),
-    genre: yup.number().required("Este campo é obrigatório"),
+    genre: yup.string().required("Este campo é obrigatório"),
     acceptedTerms: yup.boolean().required("Termos são obrigatórios"),
   });
 
@@ -71,8 +76,21 @@ export default function Cadastro() {
   });
 
   const onSubmitHandler = async (data: IUser) => {
-    const response = await axios.post("/api/usuarios", { data });
-    console.log(response.data);
+    data.password = createHmac(
+      "sha256",
+      process.env.NEXT_PUBLIC_HASH_KEY!
+    )
+      .update(data.password)
+      .digest("hex");
+
+    delete data.confirmEmail;
+    delete data.confirmPassword;
+      
+    const response = await api.post<IUser>("/user", data);
+
+    if (response?.status === 201) {
+      router.push("/usuario/login");
+    }
   };
 
   return (
@@ -96,6 +114,7 @@ export default function Cadastro() {
               <Controller
                 name="firstName"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputText
                     required
@@ -114,6 +133,7 @@ export default function Cadastro() {
               <Controller
                 name="lastName"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputText
                     required
@@ -132,6 +152,7 @@ export default function Cadastro() {
               <Controller
                 name="email"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputText
                     required
@@ -150,6 +171,7 @@ export default function Cadastro() {
               <Controller
                 name="confirmEmail"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputText
                     required
@@ -168,6 +190,7 @@ export default function Cadastro() {
               <Controller
                 name="password"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputText
                     required
@@ -186,6 +209,7 @@ export default function Cadastro() {
               <Controller
                 name="confirmPassword"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputText
                     required
@@ -204,6 +228,7 @@ export default function Cadastro() {
               <Controller
                 name="cpf"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
                   <InputMask
                     mask="99999999999"
@@ -226,21 +251,21 @@ export default function Cadastro() {
               <Controller
                 name="birthdate"
                 control={control}
+                defaultValue=""
                 render={({ field: { onChange, value } }) => (
-                  <InputMask
-                    mask="99/99/9999"
+                  <InputText
+                    required
+                    type="date"
+                    rounded
+                    label="Data de Nascimento"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    fullWidth
                     onChange={onChange}
                     value={value}
-                  >
-                    <InputText
-                      required
-                      type="text"
-                      rounded
-                      label="Data de Nascimento"
-                      fullWidth
-                      helperText={errors.birthdate?.message}
-                    />
-                  </InputMask>
+                    helperText={errors.birthdate?.message}
+                  />
                 )}
               />
             </Grid>
@@ -250,6 +275,7 @@ export default function Cadastro() {
                 <Controller
                   name="genre"
                   control={control}
+                  defaultValue=""
                   render={({ field: { onChange, value } }) => (
                     <SelectField
                       required

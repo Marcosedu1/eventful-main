@@ -3,11 +3,17 @@ export type IUser = {
   firstName: string;
   lastName: string;
   email: string;
-  confirmEmail: string;
+  confirmEmail?: string;
   password: string;
-  confirmPassword: string;
-  cpf: number;
+  confirmPassword?: string;
+  cpf: string;
   birthdate: string;
-  genre: number;
+  genre: "" | 1 | 2;
   acceptedTerms: boolean;
+}
+
+export type ILoggedUser = {
+  name: string;
+  email: string;
+  expires: number;
 }

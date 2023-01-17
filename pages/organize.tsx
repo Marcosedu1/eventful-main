@@ -5,16 +5,32 @@ import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
 import axios from "axios";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 import * as yup from "yup";
 import BaseHeader from "../src/components/BaseHeader";
 import InputText from "../src/components/InputField";
+import { api } from "../src/config/api-client";
+import { useApp } from "../src/context/AppContext";
 import useDebounce from "../src/hooks/useDebounce";
 import { IEvent } from "../src/interfaces/Event";
 
 export default function Organize() {
+  const { checkUser } = useApp();
+  const router = useRouter();
+
+  const [selectedBanner, setSelectedBanner] = useState<File | undefined>(
+    undefined
+  );
+  const [previewBanner, setPreviewBanner] = useState<string | undefined>(
+    undefined
+  );
+  const [cep, setCep] = useState("");
+
+  const debouncedCep = useDebounce(cep, 1000);
+
   const schema = yup.object().shape({
     title: yup
       .string()
@@ -53,23 +69,13 @@ export default function Organize() {
     resolver: yupResolver(schema),
   });
 
-  const [selectedBanner, setSelectedBanner] = useState<File | undefined>(
-    undefined
-  );
-
-  const [previewBanner, setPreviewBanner] = useState<string | undefined>(
-    undefined
-  );
-
-  const [cep, setCep] = useState("");
-
-  const debouncedCep = useDebounce(cep, 1000);
-
   useEffect(() => {
     if (!selectedBanner) {
       setPreviewBanner(undefined);
+
       return;
     }
+
     const previewUrl = URL.createObjectURL(selectedBanner);
     setPreviewBanner(previewUrl);
   }, [selectedBanner]);
@@ -77,8 +83,10 @@ export default function Organize() {
   const onSelectedBanner = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       setSelectedBanner(undefined);
+
       return;
     }
+
     setSelectedBanner(e.target.files[0]);
   };
 
@@ -92,12 +100,17 @@ export default function Organize() {
         })
         .catch((error) => {
           console.log(error);
+
           setValue("address", "");
           setValue("city", "");
           setValue("uf", "");
         });
     }
   }, [debouncedCep, setValue]);
+
+  useEffect(() => {
+    checkUser();
+  }, [checkUser]);
 
   const getAddressByCep = (value: string) => {
     return axios
@@ -106,8 +119,27 @@ export default function Organize() {
   };
 
   const onSubmitHandler = async (data: IEvent) => {
-    console.log(data);
-    const response = await axios.post("/api/evento", { data });
+    const response = await api.post<IEvent>("/event", data);
+    const { id } = response.data;
+
+    if (response.status === 201) {
+      if (selectedBanner) {
+        const formData = new FormData();
+
+        formData.append("file", selectedBanner);
+
+        const responseUpload = await axios.post("/api/upload", formData, {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        });
+      }
+
+      router.push({
+        pathname: "/evento/[id]",
+        query: { id },
+      });
+    }
   };
 
   return (
@@ -322,7 +354,11 @@ export default function Organize() {
                           hidden
                           type="file"
                           onChange={(e) => {
-                            onChange(e.target.files);
+                            onChange(
+                              e.target.files?.length
+                                ? e.target.files[0].name
+                                : ""
+                            );
                             onSelectedBanner(e);
                           }}
                         />
