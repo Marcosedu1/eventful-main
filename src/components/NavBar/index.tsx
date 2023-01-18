@@ -37,7 +37,7 @@ export default function NavBar() {
     {
       label: "Organize",
       to: "/organize",
-      canView: isLogged,
+      canView: true,
     },
   ];
 

@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -18,7 +19,7 @@ import useDebounce from "../src/hooks/useDebounce";
 import { IEvent } from "../src/interfaces/Event";
 
 export default function Organize() {
-  const { checkUser } = useApp();
+  const { isLogged, checkUser } = useApp();
   const router = useRouter();
 
   const [selectedBanner, setSelectedBanner] = useState<File | undefined>(
@@ -141,6 +142,27 @@ export default function Organize() {
       });
     }
   };
+
+  if (!isLogged) {
+    return (
+      <Box className="mt-7 justify-center flex flex-col items-center gap-5">
+        <Typography variant="h3" className="font-light">
+          Necessário efetuar o Login
+        </Typography>
+        <Link href="/usuario/login" passHref className="w-1/5">
+          <Button
+            className="rounded-3xl"
+            fullWidth
+            color="primary"
+            component="label"
+            variant="contained"
+          >
+            Entrar
+          </Button>
+        </Link>
+      </Box>
+    );
+  }
 
   return (
     <>

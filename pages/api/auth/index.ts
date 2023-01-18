@@ -20,16 +20,20 @@ export default async function handler(
       console.log({ response });
 
       if (response.status === 200) {
-        setCookie({ res }, "@eventful:access_token", response.data.access_token, {
-          path: "/",
-        });
+        setCookie(
+          { res },
+          "@eventful:access_token",
+          response.data.access_token,
+          {
+            path: "/",
+          }
+        );
       }
 
       console.log(response.status);
 
       return res.status(response.status).send(response.data);
-    }
-    catch(error: any) {
+    } catch (error: any) {
       return res.status(error?.response?.status).send(error?.response?.data);
     }
   }

@@ -21,7 +21,8 @@ import SelectField from "../../src/components/SelectField";
 import { api } from "../../src/config/api-client";
 import { IUser } from "../../src/interfaces/User";
 
-export default function Cadastro() {
+export default function Cadastro() {  
+
   const router = useRouter();
 
   const schema = yup.object().shape({
@@ -92,7 +93,7 @@ export default function Cadastro() {
       router.push("/usuario/login");
     }
   };
-
+  
   return (
     <>
       <BaseHeader title="Cadastro" />
