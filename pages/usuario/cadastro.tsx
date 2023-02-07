@@ -1,5 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { LoadingButton } from "@mui/lab";
 import {
+  Alert,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -9,64 +11,46 @@ import {
   MenuItem
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { createHmac } from "crypto";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
-import * as yup from "yup";
 import BaseHeader from "../../src/components/BaseHeader";
-import Button from "../../src/components/Button";
 import InputText from "../../src/components/InputField";
 import SelectField from "../../src/components/SelectField";
-import { api } from "../../src/config/api-client";
 import { IUser } from "../../src/interfaces/User";
+import { schema } from "../../src/validations/registerSchema";
 
-export default function Cadastro() {  
+export default function Cadastro() {
+  const [error, setError] = useState(null);
 
-  const router = useRouter();
+  const router = useRouter();  
 
-  const schema = yup.object().shape({
-    firstName: yup
-      .string()
-      .min(1, "Este campo é obrigatório")
-      .max(20, "Nome não pode exceder limite de 20 caracteres")
-      .required("Este campo é obrigatório"),
-    lastName: yup
-      .string()
-      .min(1, "Este campo é obrigatório")
-      .max(20, "Sobrenome não pode exceder limite de 20 caracteres")
-      .required("Este campo é obrigatório"),
-    email: yup
-      .string()
-      .email("Digite um e-mail válido")
-      .required("Este campo é obrigatório"),
-    confirmEmail: yup
-      .string()
-      .oneOf([yup.ref("email"), null], "E-mail não corresponde")
-      .required("Este campo é obrigatório"),
-    password: yup
-      .string()
-      .min(8, "Senha deve conter pelo menos 8 caracteres")
-      .max(32, "Senha excede o limite")
-      .required("Este campo é obrigatório"),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref("password"), null], "Senha não corresponde")
-      .required("Este campo é obrigatório"),
-    cpf: yup
-      .string()
-      .min(11, "CPF deve conter 11 caracteres")
-      .max(11, "CPF inválido")
-      .required("Este campo é obrigatório"),
-    birthdate: yup
-      .date()
-      //..transform((value, originalValue) => originalValue ? parse(originalValue, "yyyy-MM-dd", new Date()) : value)
-      .max(new Date(), "Digite uma data válida")
-      .required("Este campo é obrigatório")
-      .typeError("Digite uma data válida"),
-    genre: yup.string().required("Este campo é obrigatório"),
-    acceptedTerms: yup.boolean().required("Termos são obrigatórios"),
+  const { isLoading, isError, mutateAsync } = useMutation({
+    mutationFn: (data: IUser) => axios.post("/api/user/signup", data),
+    onError: (error: any) => {
+      setError(error?.response?.data?.msg);
+    },
+    onSuccess: () => {
+      setError(null);
+      router.push("/usuario/login");
+    },
   });
+console.log(isError);
+
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setError(null);
+  };
 
   const {
     control,
@@ -77,29 +61,29 @@ export default function Cadastro() {
   });
 
   const onSubmitHandler = async (data: IUser) => {
-    data.password = createHmac(
-      "sha256",
-      process.env.NEXT_PUBLIC_HASH_KEY!
-    )
-      .update(data.password)
-      .digest("hex");
-
     delete data.confirmEmail;
     delete data.confirmPassword;
-      
-    const response = await api.post<IUser>("/user", data);
 
-    if (response?.status === 201) {
-      router.push("/usuario/login");
-    }
+    await mutateAsync(data);
   };
-  
+
   return (
     <>
       <BaseHeader title="Cadastro" />
 
       <Box className="flex justify-center flex-col items-center mt-5">
         <h1 className="text-3xl mb-5">Cadastro</h1>
+
+        {isError && error && (
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            sx={{ width: "50%", marginBottom: "10px" }}
+          >
+            {error}
+          </Alert>
+        )}
+
         <FormControl
           variant="standard"
           fullWidth
@@ -313,13 +297,18 @@ export default function Cadastro() {
               </FormControl>
             </Grid>
           </Grid>
-
-          <Button
-            size="sm"
-            color="secondary"
-            title="Cadastrar"
+          <LoadingButton
+            disabled={isLoading}
+            loading={isLoading}
+            loadingPosition="end"
+            color="primary"
+            variant="contained"
+            className="rounded-3xl w-1/6"
+            component="label"
             onClick={handleSubmit(onSubmitHandler)}
-          />
+          >
+            Cadastrar
+          </LoadingButton>
         </FormControl>
       </Box>
     </>

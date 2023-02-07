@@ -9,15 +9,11 @@ export default async function handler(
   if (req.method === "POST") {
     const { email, password } = req.body;
 
-    console.log(req.body);
-
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/token`,
         { email, password }
       );
-
-      console.log({ response });
 
       if (response.status === 200) {
         setCookie(
@@ -30,8 +26,6 @@ export default async function handler(
         );
       }
 
-      console.log(response.status);
-
       return res.status(response.status).send(response.data);
     } catch (error: any) {
       return res.status(error?.response?.status).send(error?.response?.data);
@@ -39,6 +33,6 @@ export default async function handler(
   }
 
   return res
-    .status(404)
+    .status(400)
     .send({ code: "bad_request", msg: "Ocorreu um erro ao fazer o login" });
 }

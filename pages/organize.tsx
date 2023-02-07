@@ -1,22 +1,21 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import UploadIcon from "@mui/icons-material/Upload";
-import { FormControl, Grid, Typography } from "@mui/material";
+import { Alert, FormControl, Grid, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
-import * as yup from "yup";
 import BaseHeader from "../src/components/BaseHeader";
 import InputText from "../src/components/InputField";
-import { api } from "../src/config/api-client";
 import { useApp } from "../src/context/AppContext";
 import useDebounce from "../src/hooks/useDebounce";
 import { IEvent } from "../src/interfaces/Event";
+import { schema } from "../src/validations/organizeSchema";
 
 export default function Organize() {
   const { isLogged, checkUser } = useApp();
@@ -29,36 +28,33 @@ export default function Organize() {
     undefined
   );
   const [cep, setCep] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const debouncedCep = useDebounce(cep, 1000);
+  const debouncedCep = useDebounce(cep, 500);
 
-  const schema = yup.object().shape({
-    title: yup
-      .string()
-      .min(5, "Este campo é obrigatório")
-      .max(100, "Titulo não pode exceder limite de 100 caracteres")
-      .required("Este campo é obrigatório"),
-    description: yup
-      .string()
-      .max(2000, "Descrição excede o limite de caracteres")
-      .required("Este campo é obrigatório"),
-    cep: yup
-      .string()
-      .min(8, "CEP Inválido")
-      .required("Este campo é obrigatório"),
-    address: yup.string().required("Este campo é obrigatório"),
-    number: yup.string().required("Este campo é obrigatório"),
-    city: yup.string().required("Este campo é obrigatório"),
-    uf: yup
-      .string()
-      .min(2, "Este campo é obrigatório")
-      .required("Este campo é obrigatório"),
-    datetime: yup
-      .date()
-      .min(new Date(), "Digite uma data válida")
-      .required("Este campo é obrigatório")
-      .typeError("Digite uma data válida"),
-    banner: yup.mixed().required("Banner é obrigatório"),
+  const { isLoading, isError, mutateAsync } = useMutation({
+    mutationFn: (data: IEvent) => axios.post("/api/event/organize", data),
+    onError: (error: any) => {
+      setError(error?.response?.data?.msg);
+    },
+    onSuccess: (response) => {
+      setError(null);
+    },
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: (data: FormData) =>
+      axios.post("/api/upload", data, {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      }),
+    onError: (error: any) => {
+      setError(error?.response?.data?.msg);
+    },
+    onSuccess: (response) => {
+      setError(null);
+    },
   });
 
   const {
@@ -69,6 +65,77 @@ export default function Organize() {
   } = useForm<IEvent>({
     resolver: yupResolver(schema),
   });
+
+  const onSelectedBanner = (e: ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      setSelectedBanner(undefined);
+
+      return;
+    }
+
+    setSelectedBanner(e.target.files[0]);
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setError(null);
+  };
+
+  const getAddressByCep = (value: string) => {
+    return axios
+      .get(`https://viacep.com.br/ws/${value}/json/`)
+      .then((response) => response.data);
+  };
+
+  const onSubmitHandler = async (data: IEvent) => {
+    // try {
+    //   const response = await api.post<IEvent>("/event", data);
+
+    //   if (response.status === 201) {
+    //     const { id } = response.data;
+    //     if (selectedBanner) {
+    //       const formData = new FormData();
+
+    //       formData.append("file", selectedBanner);
+
+    //       const responseUpload = await axios.post("/api/upload", formData, {
+    //         headers: {
+    //           "content-type": "multipart/form-data",
+    //         },
+    //       });
+    //     }
+
+    //     router.push({
+    //       pathname: "/evento/[id]",
+    //       query: { id },
+    //     });
+    //   }
+    // } catch (error: any) {
+    //   setError("Não foi possivel criar o evento. Ocorreu um erro inesperado");
+    // }
+    const response = await mutateAsync(data);
+    if (response.status === 201) {
+      const { id } = response.data;
+      if (selectedBanner) {
+        const formData = new FormData();
+
+        formData.append("file", selectedBanner);
+
+        await uploadMutation.mutateAsync(formData);
+      }
+
+      router.push({
+        pathname: "/evento/[id]",
+        query: { id },
+      });
+    }
+  };
 
   useEffect(() => {
     if (!selectedBanner) {
@@ -81,16 +148,6 @@ export default function Organize() {
     setPreviewBanner(previewUrl);
   }, [selectedBanner]);
 
-  const onSelectedBanner = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedBanner(undefined);
-
-      return;
-    }
-
-    setSelectedBanner(e.target.files[0]);
-  };
-
   useEffect(() => {
     if (debouncedCep) {
       getAddressByCep(debouncedCep)
@@ -100,8 +157,6 @@ export default function Organize() {
           setValue("uf", results.uf);
         })
         .catch((error) => {
-          console.log(error);
-
           setValue("address", "");
           setValue("city", "");
           setValue("uf", "");
@@ -113,56 +168,11 @@ export default function Organize() {
     checkUser();
   }, [checkUser]);
 
-  const getAddressByCep = (value: string) => {
-    return axios
-      .get(`https://viacep.com.br/ws/${value}/json/`)
-      .then((response) => response.data);
-  };
-
-  const onSubmitHandler = async (data: IEvent) => {
-    const response = await api.post<IEvent>("/event", data);
-    const { id } = response.data;
-
-    if (response.status === 201) {
-      if (selectedBanner) {
-        const formData = new FormData();
-
-        formData.append("file", selectedBanner);
-
-        const responseUpload = await axios.post("/api/upload", formData, {
-          headers: {
-            "content-type": "multipart/form-data",
-          },
-        });
-      }
-
-      router.push({
-        pathname: "/evento/[id]",
-        query: { id },
-      });
+  useEffect(() => {
+    if (!isLogged) {
+      router.push("/usuario/login");
     }
-  };
-
-  if (!isLogged) {
-    return (
-      <Box className="mt-7 justify-center flex flex-col items-center gap-5">
-        <Typography variant="h3" className="font-light">
-          Necessário efetuar o Login
-        </Typography>
-        <Link href="/usuario/login" passHref className="w-1/5">
-          <Button
-            className="rounded-3xl"
-            fullWidth
-            color="primary"
-            component="label"
-            variant="contained"
-          >
-            Entrar
-          </Button>
-        </Link>
-      </Box>
-    );
-  }
+  }, [isLogged, router]);
 
   return (
     <>
@@ -170,6 +180,15 @@ export default function Organize() {
 
       <Box className="flex justify-center flex-col items-center mt-5">
         <h1 className="text-3xl mb-5">Organize</h1>
+        {error && (
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            sx={{ width: "50%", marginBottom: "10px" }}
+          >
+            {error}
+          </Alert>
+        )}
         <FormControl
           variant="standard"
           fullWidth
@@ -353,7 +372,7 @@ export default function Organize() {
               />
             </Grid>
             <Grid item xs={4}>
-              <Grid container gap={3} alignItems="center">
+              <Grid container gap={1} alignItems="center">
                 <Grid item>
                   <Controller
                     name="banner"
@@ -390,7 +409,7 @@ export default function Organize() {
                 </Grid>
 
                 {previewBanner && (
-                  <Grid item>
+                  <Grid item className="ml-4">
                     <Image
                       alt="previewBanner"
                       src={previewBanner}
@@ -406,7 +425,6 @@ export default function Organize() {
               </Grid>
             </Grid>
           </Grid>
-
           <Button
             className="rounded-3xl"
             color="secondary"

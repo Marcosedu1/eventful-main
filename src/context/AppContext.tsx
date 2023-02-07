@@ -65,7 +65,6 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
 
   const signOut = useCallback(() => {
     if (token) {
-      console.log(token)
       setLoggedUser(null);
       setToken(null);
 

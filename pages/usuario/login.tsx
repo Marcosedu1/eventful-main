@@ -3,21 +3,21 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { LoadingButton } from "@mui/lab";
 import { Alert, FormControl, IconButton } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Box } from "@mui/system";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { createHmac } from "crypto";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import * as yup from "yup";
 import BaseHeader from "../../src/components/BaseHeader";
-import Button from "../../src/components/Button";
 import InputText from "../../src/components/InputField";
 import { useApp } from "../../src/context/AppContext";
 import { IUser } from "../../src/interfaces/User";
+import { schema } from "../../src/validations/loginSchema";
 
 export default function Login() {
   const { setToken, checkUser } = useApp();
@@ -26,24 +26,20 @@ export default function Login() {
 
   const router = useRouter();
 
-  const schema = yup.object().shape({
-    email: yup
-      .string()
-      .email("Por favor, forneça um endereço de e-mail válido.")
-      .required("Este campo é obrigatório"),
-    password: yup
-      .string()
-      .transform((_, originalValue) => {
-        return createHmac(
-          "sha256",
-          process.env.NEXT_PUBLIC_HASH_KEY!
-        )
-          .update(originalValue)
-          .digest("hex");
-      })
-      .required("Este campo é obrigatório"),
-  });
+  const { isLoading, isError, mutateAsync } = useMutation({
+    mutationFn: (data: IUser) => axios.post("/api/auth", data),
+    onError: (error: any) => {
+      setToken("");
+      setError(error?.response?.data?.msg);
+    },
+    onSuccess: (response) => {
+      setToken(response.data.access_token);
+      checkUser();
+      setError(null);
 
+      router.push(router.asPath);
+    },
+  });
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (
@@ -72,21 +68,7 @@ export default function Login() {
   });
 
   const onSubmitHandler = async (data: IUser) => {
-    try {
-      const response = await axios.post("/api/auth", data);
-
-      if (response.status === 200) {
-        setToken(response.data.access_token);
-        checkUser();
-        setError(null);
-
-        router.push("/");
-      }
-    } catch (error: any) {
-      console.log(error);
-      setToken("");
-      setError(error.response.data.msg);
-    }
+    await mutateAsync(data);
   };
 
   return (
@@ -95,7 +77,7 @@ export default function Login() {
 
       <Box className="flex justify-center flex-col items-center mt-5">
         <h1 className="text-3xl mb-5">Acesse sua Conta</h1>
-        {error && (
+        {isError && error && (
           <Alert
             onClose={handleClose}
             severity="error"
@@ -166,12 +148,18 @@ export default function Login() {
               />
             )}
           />
-          <Button
-            size="sm"
-            color="secondary"
-            title="Entrar"
+          <LoadingButton
+            disabled={isLoading}
+            loading={isLoading}
+            loadingPosition="end"
+            color="primary"
+            variant="contained"
+            className="rounded-3xl w-1/4"
+            component="label"
             onClick={handleSubmit(onSubmitHandler)}
-          />
+          >
+            Entrar
+          </LoadingButton>
         </FormControl>
         <Box className="mt-3">
           <Link className="text-yellow-500 font-medium" href="cadastro">

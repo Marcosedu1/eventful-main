@@ -8,7 +8,7 @@ export type IUser = {
   confirmPassword?: string;
   cpf: string;
   birthdate: string;
-  genre: "" | 1 | 2;
+  genre: "" | '1' | '2';
   acceptedTerms: boolean;
 }
 

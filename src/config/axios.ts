@@ -4,11 +4,12 @@ import { InvalidTokenError } from "./errors/invalid-token-errors";
 
 export function setupAPIClient(ctx = undefined) {
   const cookies = parseCookies(ctx);
-
+  console.log(cookies,"texto");
+  
   const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     headers: {
-      Authorization: `Bearer ${cookies['@eventful:access_token']}`,
+      Authorization: `Bearer ${cookies["@eventful:access_token"]}`,
     },
   });
 
@@ -18,14 +19,8 @@ export function setupAPIClient(ctx = undefined) {
     },
     (error: AxiosError<any, string>) => {
       if (error.response?.status === 401) {
-        // if ("error" in error.response?.data) {
-        //   return Promise.reject(error);
-        // } else {
         return Promise.reject(new InvalidTokenError());
-        //}
       }
-
-      //return Promise.reject(error);
     }
   );
 
