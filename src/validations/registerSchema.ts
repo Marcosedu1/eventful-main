@@ -1,45 +1,60 @@
-import { subYears } from 'date-fns';
-import * as yup from 'yup';
+import { subYears } from "date-fns";
+import {
+  addMethod,
+  string,
+  object,
+  ref,
+  date,
+  boolean,
+  StringSchema,
+} from "yup";
+import { validateCpf } from "../utils/validateCpf";
 
-export const schema = yup.object().shape({
-  firstName: yup
-    .string()
+addMethod<StringSchema>(string, "cpf", function (message) {
+  return this.test("test-cpf-valid", message, function (value) {
+    const { path, createError } = this;
+    return validateCpf(value) || createError({ path, message });
+  });
+});
+
+export const schema = object().shape({
+  firstName: string()
     .min(3, "Este campo é obrigatório")
     .max(20, "Nome não pode exceder limite de 20 caracteres")
     .required("Este campo é obrigatório"),
-  lastName: yup
-    .string()
+  lastName: string()
     .min(3, "Este campo é obrigatório")
     .max(20, "Sobrenome não pode exceder limite de 20 caracteres")
     .required("Este campo é obrigatório"),
-  email: yup
-    .string()
+  email: string()
     .email("Digite um e-mail válido")
     .required("Este campo é obrigatório"),
-  confirmEmail: yup
-    .string()
-    .oneOf([yup.ref("email"), null], "E-mail não corresponde")
+  confirmEmail: string()
+    .oneOf([ref("email"), null], "E-mail não corresponde")
     .required("Este campo é obrigatório"),
-  password: yup
-    .string()
+  password: string()
     .min(8, "Senha deve conter pelo menos 8 caracteres")
     .max(32, "Senha excede o limite")
     .required("Este campo é obrigatório"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Senha não corresponde")
+  confirmPassword: string()
+    .oneOf([ref("password"), null], "Senha não corresponde")
     .required("Este campo é obrigatório"),
-  cpf: yup
-    .string()
+  cpf: string()
     .min(11, "CPF deve conter 11 caracteres")
     .max(11, "CPF inválido")
+    .cpf("CPF Inválido")
     .required("Este campo é obrigatório"),
-  birthdate: yup
-    .date()
+  birthdate: date()
     .min(subYears(new Date(), 100), "Digite uma data válida")
     .max(subYears(new Date(), 13), "Você deve ter pelo menos 13 anos")
     .required("Este campo é obrigatório")
     .typeError("Digite uma data válida"),
-  genre: yup.string().required("Este campo é obrigatório"),
-  acceptedTerms: yup.boolean().required("Termos são obrigatórios"),
+  genre: string().required("Este campo é obrigatório"),
+  acceptedTerms: boolean().required("Termos são obrigatórios"),
 });
+
+declare module "yup" {
+  interface StringSchema {
+    cpf(messageError: string): StringSchema;
+  }
+}
