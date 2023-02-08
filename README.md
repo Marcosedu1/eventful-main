@@ -1,19 +1,20 @@
-Este projeto foi realizado em Nextjs sem qualquer fim lucrativo, apenas aprendizado
+### Este projeto foi realizado em Nextjs sem qualquer fim lucrativo, apenas aprendizado
+#### Desenvolvido em conjunto com [eventful-api-master](https://github.com/Marcosedu1/eventful-api-master)
 
-Primeiramente instalar as dependencias:
+- Primeiramente instalar as dependencias:
 ```
-npm install
-```
-
-Ambiente de desenvolvimento:
-
-```
-npm run dev
+- npm install
 ```
 
-Ambiente de produção
+- Ambiente de desenvolvimento:
 
 ```
-npm run build
-npm start
+- npm run dev
+```
+
+- Ambiente de produção
+
+```
+- npm run build
+- npm start
 ```
