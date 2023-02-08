@@ -15,6 +15,7 @@ import { ILoggedUser } from "../interfaces/User";
 type AppContextValue = {
   isLogged: boolean;
   user: ILoggedUser | null;
+  token: string | null;
   setToken: Dispatch<SetStateAction<string | null>>;
   checkUser: () => boolean;
   signOut: () => void;
@@ -23,6 +24,7 @@ type AppContextValue = {
 export const AppContext = createContext<AppContextValue | null>({
   isLogged: false,
   user: {} as ILoggedUser,
+  token: null,
   setToken: () => {},
   checkUser: () => false,
   signOut: () => {},
@@ -95,6 +97,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
       value={{
         isLogged: token ? true : false,
         user: loggedUser,
+        token,
         setToken,
         checkUser,
         signOut,

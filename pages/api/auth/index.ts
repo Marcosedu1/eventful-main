@@ -28,7 +28,7 @@ export default async function handler(
 
       return res.status(response.status).send(response.data);
     } catch (error: any) {
-      return res.status(error?.response?.status).send(error?.response?.data);
+      return res.status(error?.response?.status ?? 500).send(error?.response?.data ?? "Ocorreu um erro ao fazer o login");
     }
   }
 

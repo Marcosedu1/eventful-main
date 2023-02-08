@@ -9,7 +9,7 @@ export default function EventDetail() {
   const {
     query: { id },
   } = useRouter();
-  const { data, fetchStatus, status } = useEvent(Number(id!));
+  const { data, fetchStatus, status } = useEvent(id as string);
 
   const bannerUrl = data?.banner
     ? `/uploads/${data?.banner}`
