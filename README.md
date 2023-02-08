@@ -1,4 +1,4 @@
-Este projeto foi realizado em Nextjs
+Este projeto foi realizado em Nextjs sem qualquer fim lucrativo, apenas aprendizado
 
 Primeiramente instalar as dependencias:
 ```
