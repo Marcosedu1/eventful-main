@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -24,22 +24,20 @@ import { IUser } from "../../src/interfaces/User";
 import { schema } from "../../src/validations/registerSchema";
 
 export default function Cadastro() {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const router = useRouter();  
+  const router = useRouter();
 
   const { isLoading, isError, mutateAsync } = useMutation({
     mutationFn: (data: IUser) => axios.post("/api/user/signup", data),
-    onError: (error: any) => {
-      setError(error?.response?.data?.msg);
+    onError: (error: AxiosError<{ msg: string, code: string }, any>) => {
+      setError(error?.response?.data?.msg ?? error?.response?.data?.toString() ?? null);
     },
     onSuccess: () => {
       setError(null);
       router.push("/usuario/login");
     },
   });
-console.log(isError);
-
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,

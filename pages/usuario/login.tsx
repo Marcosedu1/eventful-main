@@ -8,7 +8,7 @@ import { Alert, FormControl, IconButton } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import { Box } from "@mui/system";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -22,15 +22,15 @@ import { schema } from "../../src/validations/loginSchema";
 export default function Login() {
   const { setToken, checkUser } = useApp();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
   const { isLoading, isError, mutateAsync } = useMutation({
     mutationFn: (data: IUser) => axios.post("/api/auth", data),
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ msg: string, code: string }, any>) => {
       setToken("");
-      setError(error?.response?.data?.msg);
+      setError(error?.response?.data?.msg ?? error?.response?.data?.toString() ?? null);
     },
     onSuccess: (response) => {
       setToken(response.data.access_token);
@@ -40,6 +40,7 @@ export default function Login() {
       router.push(router.asPath);
     },
   });
+  
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (
@@ -139,6 +140,7 @@ export default function Login() {
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
                         edge="end"
+                        disabled={!value}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>

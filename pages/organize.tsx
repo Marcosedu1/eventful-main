@@ -4,7 +4,7 @@ import { Alert, FormControl, Grid, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Box } from "@mui/system";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -12,13 +12,14 @@ import { Controller, useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 import BaseHeader from "../src/components/BaseHeader";
 import InputText from "../src/components/InputField";
+import { api } from "../src/config/api-client";
 import { useApp } from "../src/context/AppContext";
 import useDebounce from "../src/hooks/useDebounce";
 import { IEvent } from "../src/interfaces/Event";
 import { schema } from "../src/validations/organizeSchema";
 
 export default function Organize() {
-  const { isLogged, checkUser } = useApp();
+  const { isLogged, checkUser, token } = useApp();
   const router = useRouter();
 
   const [selectedBanner, setSelectedBanner] = useState<File | undefined>(
@@ -33,9 +34,13 @@ export default function Organize() {
   const debouncedCep = useDebounce(cep, 500);
 
   const { isLoading, isError, mutateAsync } = useMutation({
-    mutationFn: (data: IEvent) => axios.post("/api/event/organize", data),
-    onError: (error: any) => {
-      setError(error?.response?.data?.msg);
+    mutationFn: (data: IEvent) => api.post("/event", data,  {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+    onError: (error: AxiosError<{ msg: string, code: string }, any>) => {
+      setError(error?.response?.data?.msg ?? null);
     },
     onSuccess: (response) => {
       setError(null);
@@ -49,10 +54,10 @@ export default function Organize() {
           "content-type": "multipart/form-data",
         },
       }),
-    onError: (error: any) => {
-      setError(error?.response?.data?.msg);
+    onError: (error: AxiosError<{ msg: string, code: string }, any>) => {
+      setError(error?.response?.data?.msg ?? null);
     },
-    onSuccess: (response) => {
+    onSuccess: (_) => {
       setError(null);
     },
   });
@@ -77,7 +82,7 @@ export default function Organize() {
   };
 
   const handleClose = (
-    event?: React.SyntheticEvent | Event,
+    _?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
     if (reason === "clickaway") {
@@ -94,34 +99,11 @@ export default function Organize() {
   };
 
   const onSubmitHandler = async (data: IEvent) => {
-    // try {
-    //   const response = await api.post<IEvent>("/event", data);
-
-    //   if (response.status === 201) {
-    //     const { id } = response.data;
-    //     if (selectedBanner) {
-    //       const formData = new FormData();
-
-    //       formData.append("file", selectedBanner);
-
-    //       const responseUpload = await axios.post("/api/upload", formData, {
-    //         headers: {
-    //           "content-type": "multipart/form-data",
-    //         },
-    //       });
-    //     }
-
-    //     router.push({
-    //       pathname: "/evento/[id]",
-    //       query: { id },
-    //     });
-    //   }
-    // } catch (error: any) {
-    //   setError("Não foi possivel criar o evento. Ocorreu um erro inesperado");
-    // }
     const response = await mutateAsync(data);
+
     if (response.status === 201) {
       const { id } = response.data;
+      
       if (selectedBanner) {
         const formData = new FormData();
 
