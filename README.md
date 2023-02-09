@@ -18,3 +18,5 @@
 - npm run build
 - npm start
 ```
+
+#### Executar em simultaneo ao [eventful-api-master](https://github.com/Marcosedu1/eventful-api-master)
