@@ -1,12 +1,12 @@
 import { subYears } from "date-fns";
 import {
   addMethod,
-  string,
+  boolean,
+  date,
   object,
   ref,
-  date,
-  boolean,
-  StringSchema,
+  string,
+  StringSchema
 } from "yup";
 import { validateCpf } from "../utils/validateCpf";
 

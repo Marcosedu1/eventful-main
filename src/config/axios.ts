@@ -4,7 +4,6 @@ import { InvalidTokenError } from "./errors/invalid-token-errors";
 
 export function setupAPIClient(ctx = undefined) {
   const cookies = parseCookies(ctx);
-  console.log(cookies, "texto", parseCookies());
   
   const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
